@@ -1,0 +1,13 @@
+%% Repeat Loop Example - Count from 0 to 4
+SCRIPT AREA
+START SCRIPT
+DECLARE INT counter=0
+
+REPEAT WHEN (counter < 5)
+START REPEAT
+PRINT: "Counter: " & counter & $
+counter = counter + 1
+END REPEAT
+
+PRINT: "Done!"
+END SCRIPT

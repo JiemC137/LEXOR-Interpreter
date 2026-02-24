@@ -1,0 +1,14 @@
+%% Arithmetic Operations Example
+SCRIPT AREA
+START SCRIPT
+DECLARE INT a=10, b=3
+DECLARE INT sum, product, quotient
+
+sum = a + b
+product = a * b
+quotient = a / b
+
+PRINT: "Addition: " & a & " + " & b & " = " & sum & $
+PRINT: "Multiplication: " & a & " * " & b & " = " & product & $
+PRINT: "Division: " & a & " / " & b & " = " & quotient
+END SCRIPT
