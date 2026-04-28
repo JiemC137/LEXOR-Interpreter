@@ -1,0 +1,5 @@
+%% Sample LEXOR Program - Hello World
+SCRIPT AREA
+START SCRIPT
+PRINT: "Hello" & $ & "World"
+END SCRIPT

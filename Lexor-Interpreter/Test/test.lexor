@@ -5,5 +5,5 @@ DECLARE CHAR a_1='n'
 DECLARE BOOL t="TRUE"
 x=y=4
 a_1='c'
-PRINT: x & t & z & $ & a_1 & [#] & "last"
+PRINT: x & t & z & $ & a_1 & [#] & "lassssssssssst"
 END SCRIPT
