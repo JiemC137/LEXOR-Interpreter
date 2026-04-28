@@ -198,7 +198,8 @@ Token Lexer::nextToken() {
             return Token(TOKEN_STRING, escape, startLine, startColumn);
         }
         advance();
-        return Token(TOKEN_RBRACKET, "]", startLine, startColumn - 1);
+        if (current == ']') advance();
+        return Token(TOKEN_STRING, "]", startLine, startColumn);
     }
     
     // Operators and punctuation

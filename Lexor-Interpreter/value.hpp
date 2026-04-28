@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <sstream>
 using namespace std;
 
 class Value {
@@ -41,7 +44,27 @@ public:
             case TYPE_INT:
                 return to_string((int)numValue);
             case TYPE_FLOAT:
-                return to_string(numValue);
+            {
+                double rounded = round(numValue);
+                if (fabs(numValue - rounded) < 1e-9) {
+                    return to_string((long long)rounded);
+                }
+
+                ostringstream out;
+                out << setprecision(15) << numValue;
+                string text = out.str();
+
+                if (text.find('.') != string::npos) {
+                    while (!text.empty() && text.back() == '0') {
+                        text.pop_back();
+                    }
+                    if (!text.empty() && text.back() == '.') {
+                        text.pop_back();
+                    }
+                }
+
+                return text;
+            }
             case TYPE_CHAR:
                 return string(1, charValue);
             case TYPE_BOOL:

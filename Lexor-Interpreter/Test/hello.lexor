@@ -2,4 +2,7 @@
 SCRIPT AREA
 START SCRIPT
 PRINT: "Hello" & $ & "World"
+DECLARE INT x, y
+SCAN: x, y
+PRINT: x & y
 END SCRIPT

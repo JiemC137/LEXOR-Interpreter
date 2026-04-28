@@ -1,0 +1,14 @@
+%% Test IF ELSE statement
+SCRIPT AREA
+START SCRIPT
+DECLARE INT x
+x = 2
+IF (x > 5)
+START IF
+PRINT: "x is greater than 5"
+END IF
+ELSE
+START IF
+PRINT: "x is not greater than 5"
+END IF
+END SCRIPT
