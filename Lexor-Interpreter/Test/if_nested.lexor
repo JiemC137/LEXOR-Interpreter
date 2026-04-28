@@ -1,0 +1,15 @@
+%% Test nested IF statements
+SCRIPT AREA
+START SCRIPT
+DECLARE INT x, y
+x = 10
+y = 5
+IF (x > 5)
+START IF
+PRINT: "x is greater than 5"
+IF (y > 3)
+START IF
+PRINT: "y is also greater than 3"
+END IF
+END IF
+END SCRIPT

@@ -163,15 +163,17 @@ shared_ptr<Assignment> Parser::assignment() {
     string varName = consume(TOKEN_IDENTIFIER, "Expected variable name").value;
     vars.push_back(varName);
     
-    while (check(TOKEN_ASSIGN)) {
-        advance();
-        if (check(TOKEN_IDENTIFIER)) {
-            string nextVar = consume(TOKEN_IDENTIFIER, "Expected variable name").value;
-            vars.push_back(nextVar);
-        } else {
-            break;
+        while (check(TOKEN_ASSIGN)) {
+            advance();
+            if (check(TOKEN_IDENTIFIER) && peekNext().type == TOKEN_ASSIGN) {
+                // Chained assignment: x = y = z = value
+                string nextVar = consume(TOKEN_IDENTIFIER, "Expected variable name").value;
+                vars.push_back(nextVar);
+            } else {
+                // Not a chained assignment, this identifier is part of the expression
+                break;
+            }
         }
-    }
     
     // Get the value
     ExprPtr value = expression();
@@ -233,25 +235,8 @@ shared_ptr<IfStatement> Parser::ifStatement() {
         ifStmt->hasElse = true;
         
         if (check(TOKEN_IF)) {
-            advance();
-            // ELSE IF - treat as nested if
-            consume(TOKEN_LPAREN, "Expected (");
-            auto elseCondition = expression();
-            consume(TOKEN_RPAREN, "Expected )");
-            
-            consume(TOKEN_START, "Expected START");
-            consume(TOKEN_IF, "Expected IF");
-            
-            auto elseIfStmt = make_shared<IfStatement>(elseCondition);
-            
-            while (!check(TOKEN_END)) {
-                if (check(TOKEN_ELSE)) break;
-                elseIfStmt->ifBody.push_back(statement());
-            }
-            
-            consume(TOKEN_END, "Expected END");
-            consume(TOKEN_IF, "Expected IF");
-            
+            // ELSE IF - recursively parse as another if statement
+            auto elseIfStmt = ifStatement();
             ifStmt->elseBody.push_back(elseIfStmt);
         } else {
             consume(TOKEN_START, "Expected START");
