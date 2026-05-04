@@ -4,6 +4,7 @@ DECLARE INT x, y, z=5
 DECLARE CHAR a_1='n'
 DECLARE BOOL t="TRUE"
 x=y=4
+DECLARE FLOAT x = 15
 a_1='c'
 PRINT: x & t & z & $ & a_1 & [#] & "lassssssssssst"
 END SCRIPT

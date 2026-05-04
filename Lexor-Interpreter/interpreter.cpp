@@ -4,9 +4,54 @@
 
 Interpreter::Interpreter() : loopBreak(false) {}
 
-void Interpreter::checkTypeCompatibility(string varName, string type, Value value) {
-    // Basic type checking - can be expanded
-    // For now, we'll allow implicit conversions
+Value Interpreter::checkTypeCompatibility(string varName, string type, Value value) {
+    // Map declared type string to Value::Type and enforce compatibility.
+    if (type == "INT") {
+        if (value.type == Value::TYPE_INT) return value;
+        // Disallow assigning non-numeric or float to INT implicitly
+        if (value.type == Value::TYPE_FLOAT) {
+            // allow narrowing by truncation
+            return Value((int)value.toNumber());
+        }
+        throw runtime_error("Type error: cannot assign value of different type to INT variable '" + varName + "'");
+    }
+
+    if (type == "FLOAT") {
+        if (value.type == Value::TYPE_FLOAT) return value;
+        if (value.type == Value::TYPE_INT) {
+            return Value(value.toNumber());
+        }
+        throw runtime_error("Type error: cannot assign non-numeric value to FLOAT variable '" + varName + "'");
+    }
+
+    if (type == "CHAR") {
+        if (value.type == Value::TYPE_CHAR) return value;
+        throw runtime_error("Type error: cannot assign value of different type to CHAR variable '" + varName + "'");
+    }
+
+    if (type == "BOOL") {
+        if (value.type == Value::TYPE_BOOL) return value;
+        if (value.type == Value::TYPE_STRING) {
+            if (value.stringValue == "TRUE" || value.stringValue == "true") return Value(true);
+            if (value.stringValue == "FALSE" || value.stringValue == "false") return Value(false);
+            throw runtime_error("Type error: cannot convert string to BOOL for variable '" + varName + "'");
+        }
+        if (value.type == Value::TYPE_INT || value.type == Value::TYPE_FLOAT) {
+            return Value(value.toNumber() != 0);
+        }
+        if (value.type == Value::TYPE_CHAR) {
+            return Value(value.charValue != '\0');
+        }
+        throw runtime_error("Type error: cannot assign value of different type to BOOL variable '" + varName + "'");
+    }
+
+    if (type == "STRING") {
+        if (value.type == Value::TYPE_STRING) return value;
+        throw runtime_error("Type error: cannot assign non-string value to STRING variable '" + varName + "'");
+    }
+
+    // Unknown declared type
+    throw runtime_error("Unknown declared type '" + type + "' for variable '" + varName + "'");
 }
 
 Value Interpreter::evaluateExpression(shared_ptr<Expression> expr) {
@@ -194,8 +239,15 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
                     value = Value(false);
                 }
             }
-            
-            symbolTable[varName] = {decl->type, value};
+            // Prevent redeclaration
+            if (symbolTable.find(varName) != symbolTable.end()) {
+                throw runtime_error("Redeclaration error: variable '" + varName + "' already declared");
+            }
+
+            // Enforce declared type compatibility (may convert safely)
+            Value storeVal = checkTypeCompatibility(varName, decl->type, value);
+
+            symbolTable[varName] = {decl->type, storeVal};
         }
         return;
     }
@@ -206,10 +258,11 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
         
         for (auto& v : assign->vars) {
             if (symbolTable.find(v) != symbolTable.end()) {
-                symbolTable[v].second = value;
+                string declaredType = symbolTable[v].first;
+                Value storeVal = checkTypeCompatibility(v, declaredType, value);
+                symbolTable[v].second = storeVal;
             } else {
-                // Auto-declare if not exists (for chained assignment)
-                symbolTable[v] = {"INT", value};
+                throw runtime_error("Assignment error: variable '" + v + "' not declared");
             }
         }
         return;
@@ -270,8 +323,9 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
                 } else if (type == "BOOL") {
                     val = Value(value == "TRUE" || value == "true");
                 }
-                
-                symbolTable[varName].second = val;
+                // Enforce compatibility (may adjust numeric types)
+                Value storeVal = checkTypeCompatibility(varName, type, val);
+                symbolTable[varName].second = storeVal;
             }
             
             pos = commaPos + 1;

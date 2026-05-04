@@ -17,7 +17,7 @@ private:
     bool loopBreak;  // For loop control
     
     // Helper methods
-    void checkTypeCompatibility(string varName, string type, Value value);
+    Value checkTypeCompatibility(string varName, string type, Value value);
     Value evaluateExpression(shared_ptr<Expression> expr);
     void executeStatement(shared_ptr<Statement> stmt);
     
