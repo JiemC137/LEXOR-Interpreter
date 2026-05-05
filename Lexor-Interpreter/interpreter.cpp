@@ -10,8 +10,7 @@ Value Interpreter::checkTypeCompatibility(string varName, string type, Value val
         if (value.type == Value::TYPE_INT) return value;
         // Disallow assigning non-numeric or float to INT implicitly
         if (value.type == Value::TYPE_FLOAT) {
-            // allow narrowing by truncation
-            return Value((int)value.toNumber());
+            throw runtime_error("Type error: cannot assign Decimal value to INT variable '" + varName + "'");
         }
         throw runtime_error("Type error: cannot assign value of different type to INT variable '" + varName + "'");
     }
