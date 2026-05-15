@@ -297,29 +297,42 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
     if (auto scan = dynamic_pointer_cast<ScanStatement>(stmt)) {
         string input;
         getline(cin, input);
-        
-        // Split by comma
+
+        // Split all values by comma first
+        vector<string> parts;
         size_t pos = 0;
-        int varIdx = 0;
-        
-        while (pos < input.length() && varIdx < scan->variables.size()) {
+        while (pos <= input.length()) {
             size_t commaPos = input.find(',', pos);
             if (commaPos == string::npos) commaPos = input.length();
-            
             string value = input.substr(pos, commaPos - pos);
-            
+
             // Trim whitespace
             size_t start = value.find_first_not_of(" \t");
             size_t end = value.find_last_not_of(" \t");
             if (start != string::npos) {
                 value = value.substr(start, end - start + 1);
+            } else {
+                value = "";
             }
-            
-            // Store in symbol table
+
+            parts.push_back(value);
+            if (commaPos == input.length()) break;
+            pos = commaPos + 1;
+        }
+
+        // Enforce strict count: number of inputs must equal number of variables
+        if (parts.size() != scan->variables.size()) {
+            throw runtime_error("SCAN input count mismatch: expected " + to_string(scan->variables.size()) + " values but got " + to_string(parts.size()));
+        }
+
+        // Store each parsed value into the corresponding variable
+        for (size_t varIdx = 0; varIdx < scan->variables.size(); ++varIdx) {
+            string value = parts[varIdx];
             string varName = scan->variables[varIdx];
+
             if (symbolTable.find(varName) != symbolTable.end()) {
                 string type = symbolTable[varName].first;
-                
+
                 // Convert based on type
                 Value val;
                 if (type == "INT") {
@@ -340,17 +353,16 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
                         throw runtime_error(string("SCAN conversion error for variable '") + varName + "': " + e.what());
                     }
                 } else if (type == "CHAR") {
-                    val = Value(value[0]);
+                    val = Value(value.empty() ? '\0' : value[0]);
                 } else if (type == "BOOL") {
                     val = Value(value == "TRUE" || value == "true");
                 }
                 // Enforce compatibility (may adjust numeric types)
                 Value storeVal = checkTypeCompatibility(varName, type, val);
                 symbolTable[varName].second = storeVal;
+            } else {
+                throw runtime_error("SCAN error: variable '" + varName + "' not declared");
             }
-            
-            pos = commaPos + 1;
-            varIdx++;
         }
         return;
     }
