@@ -135,6 +135,9 @@ Value Interpreter::evalBinaryOp(string op, Value left, Value right) {
             throw runtime_error("Division by zero");
         }
         double result = left.toNumber() / rightNum;
+        if (left.type == Value::TYPE_INT && right.type == Value::TYPE_INT) {
+            return Value((int)result);
+        }
         return Value(result);
     }
     
@@ -193,10 +196,16 @@ Value Interpreter::evalBinaryOp(string op, Value left, Value right) {
 
 Value Interpreter::evalUnaryOp(string op, Value operand) {
     if (op == "+") {
+        if (operand.type == Value::TYPE_INT) {
+            return Value((int)operand.toNumber());
+        }
         return Value(operand.toNumber());
     }
     
     if (op == "-") {
+        if (operand.type == Value::TYPE_INT) {
+            return Value((int)-operand.toNumber());
+        }
         return Value(-operand.toNumber());
     }
     
