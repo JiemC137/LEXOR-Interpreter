@@ -1,0 +1,6 @@
+%% Unary plus on float
+SCRIPT AREA
+START SCRIPT
+DECLARE FLOAT f = -2.5
+PRINT: +f
+END SCRIPT

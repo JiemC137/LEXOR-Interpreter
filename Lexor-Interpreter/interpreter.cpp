@@ -323,9 +323,22 @@ void Interpreter::executeStatement(shared_ptr<Statement> stmt) {
                 // Convert based on type
                 Value val;
                 if (type == "INT") {
-                    val = Value((int)stod(value));
+                    try {
+                        double d = stod(value);
+                        // Reject non-integer input for INT variables
+                        if (std::fabs(d - std::round(d)) > 1e-9) {
+                            throw runtime_error("SCAN type mismatch: variable '" + varName + "' expects INT but input '" + value + "' is not an integer");
+                        }
+                        val = Value((int)std::round(d));
+                    } catch (const exception& e) {
+                        throw runtime_error(string("SCAN conversion error for variable '") + varName + "': " + e.what());
+                    }
                 } else if (type == "FLOAT") {
-                    val = Value(stod(value));
+                    try {
+                        val = Value(stod(value));
+                    } catch (const exception& e) {
+                        throw runtime_error(string("SCAN conversion error for variable '") + varName + "': " + e.what());
+                    }
                 } else if (type == "CHAR") {
                     val = Value(value[0]);
                 } else if (type == "BOOL") {

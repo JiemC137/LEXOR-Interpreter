@@ -1,0 +1,7 @@
+%% Assignment of float to int
+SCRIPT AREA
+START SCRIPT
+DECLARE INT x
+x = 3.5
+PRINT: x
+END SCRIPT

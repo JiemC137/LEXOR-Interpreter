@@ -1,0 +1,6 @@
+%% Declaration with float initializer for INT
+SCRIPT AREA
+START SCRIPT
+DECLARE INT x = 3.5
+PRINT: x
+END SCRIPT

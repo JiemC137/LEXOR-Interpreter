@@ -1,0 +1,6 @@
+%% Float whole number formatting
+SCRIPT AREA
+START SCRIPT
+DECLARE FLOAT f=60.0
+PRINT: f
+END SCRIPT

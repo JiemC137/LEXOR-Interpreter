@@ -1,0 +1,6 @@
+%% Float fractional number formatting
+SCRIPT AREA
+START SCRIPT
+DECLARE FLOAT f=60.25
+PRINT: f
+END SCRIPT
